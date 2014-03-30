@@ -70,7 +70,6 @@ defmodule Vex.Validators.Length do
 
   @message_fields [value: "Bad value", tokens: "Tokens from value", size: "Number of tokens", min: "Minimum acceptable value", max: "Maximum acceptable value"]
   def validate(value, options) when is_integer(options), do: validate(value, is: options)
-  def validate(value, options) when is_range(options),   do: validate(value, in: options)
   def validate(value, options) when is_list(options) do
     unless_skipping(value, options) do
       tokenizer = Keyword.get(options, :tokenizer, &tokens/1)
@@ -86,6 +85,10 @@ defmodule Vex.Validators.Length do
       end
       result findings, message(options, default_message, value: value, tokens: tokens, size: size, min: lower, max: upper)
     end
+  end
+
+  def validate(value, options) do
+    if Range.range?(options), do: validate(value, in: options)
   end
 
   defp bounds(options) do
